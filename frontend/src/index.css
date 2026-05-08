@@ -69,60 +69,62 @@ ul {
 }
 
 .full-width-main {
-  display: flex;
-  flex-direction: column-reverse;
+  display: grid;
+  grid-template-rows: 1fr 1fr; /* 50% / 50% split on mobile */
   height: calc(100vh - var(--navbar-height));
+  height: calc(100dvh - var(--navbar-height));
   overflow: hidden;
-}
-
-@media (min-width: 768px) {
-  .full-width-main {
-    flex-direction: row;
-  }
+  width: 100%;
 }
 
 .home-feed-panel {
+  grid-row: 2; /* Force to bottom on mobile */
   display: flex;
   flex-direction: column;
   background-color: var(--surface);
-  box-shadow: 0 -4px 6px -1px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.1);
   z-index: 10;
   width: 100%;
-  height: 50%;
-  flex-shrink: 0;
+  height: 100%; /* Fill the grid cell */
   position: relative;
 }
 
 .home-map-panel {
-  flex-grow: 1;
+  grid-row: 1; /* Force to top on mobile */
   width: 100%;
-  height: 50%;
+  height: 100%; /* Fill the grid cell */
   position: relative;
-  background-color: #f3f4f6;
+  background-color: #e5e7eb;
   z-index: 0;
 }
 
 .home-fab-container {
   position: absolute;
-  bottom: 1rem;
+  bottom: 1.5rem;
   left: 50%;
   transform: translateX(-50%);
-  z-index: 20;
+  z-index: 400; /* Leaflet UI is around 400 */
 }
 
 @media (min-width: 768px) {
+  .full-width-main {
+    grid-template-columns: 420px 1fr;
+    grid-template-rows: 1fr;
+  }
   .home-feed-panel {
-    width: 420px;
-    height: 100%;
+    grid-row: 1;
+    grid-column: 1;
+    border-top: none;
     border-right: 1px solid var(--border);
     box-shadow: 4px 0 15px -3px rgba(0, 0, 0, 0.1);
   }
   .home-map-panel {
-    height: 100%;
+    grid-row: 1;
+    grid-column: 2;
   }
   .home-fab-container {
-    bottom: 2rem;
-    margin-left: 210px; /* Offset by half of left panel */
+    bottom: 2.5rem;
+    margin-left: 0; 
   }
 }
 
