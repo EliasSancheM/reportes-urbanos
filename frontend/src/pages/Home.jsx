@@ -116,19 +116,16 @@ const Home = () => {
   return (
     <>
       {/* PANEL IZQUIERDO: Feed de Reportes */}
-      <div 
-        className="flex flex-col bg-surface border-r border-border shadow-xl z-10" 
-        style={{ width: '420px', flexShrink: 0, height: '100%', position: 'relative' }}
-      >
-        <div className="p-5 border-b border-border bg-surface sticky top-0 z-20">
-          <h1 className="text-2xl font-extrabold text-secondary mb-1">Incidentes</h1>
-          <p className="text-sm text-muted mb-4">Descubre lo que ocurre en tu barrio</p>
+      <div className="home-feed-panel">
+        <div className="p-4 md:p-5 border-b border-border bg-surface sticky top-0 z-20">
+          <h1 className="text-xl md:text-2xl font-extrabold text-secondary mb-1">Incidentes</h1>
+          <p className="text-xs md:text-sm text-muted mb-3 md:mb-4">Descubre lo que ocurre en tu barrio</p>
           
           <div className="form-group relative mb-3">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted" size={18} />
             <input 
               type="text" 
-              className="form-input pl-10 bg-background" 
+              className="form-input pl-10 bg-background text-sm" 
               placeholder="Buscar reportes..." 
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
@@ -137,7 +134,7 @@ const Home = () => {
           
           <div className="flex gap-2">
             <select 
-              className="form-select text-xs py-2 bg-background" 
+              className="form-select text-xs py-2 bg-background flex-1" 
               value={filterCategory}
               onChange={(e) => setFilterCategory(e.target.value)}
             >
@@ -145,19 +142,19 @@ const Home = () => {
             </select>
 
             <select 
-              className="form-select text-xs py-2 bg-background" 
+              className="form-select text-xs py-2 bg-background w-1/3" 
               value={filterStatus}
               onChange={(e) => setFilterStatus(e.target.value)}
             >
               <option value="Todos">Todos</option>
               <option value="pendiente">Pendientes</option>
-              <option value="en progreso">En Progreso</option>
+              <option value="en progreso">Progreso</option>
               <option value="resuelto">Resueltos</option>
             </select>
           </div>
         </div>
 
-        <div className="flex-1 overflow-y-auto p-4 space-y-4" style={{ backgroundColor: '#f8fafc' }}>
+        <div className="flex-1 overflow-y-auto p-3 md:p-4 space-y-3 md:space-y-4" style={{ backgroundColor: '#f8fafc' }}>
           <AnimatePresence>
             {filteredReports.length === 0 ? (
               <motion.div 
@@ -176,7 +173,7 @@ const Home = () => {
                   exit={{ opacity: 0, scale: 0.9 }}
                   whileHover={{ y: -2, boxShadow: 'var(--shadow-md)' }}
                   onClick={() => setActiveReportId(report.id)}
-                  className={`bg-surface rounded-xl border p-4 cursor-pointer transition-colors ${activeReportId === report.id ? 'border-primary ring-1 ring-primary' : 'border-border'}`}
+                  className={`bg-surface rounded-xl border p-3 md:p-4 cursor-pointer transition-colors ${activeReportId === report.id ? 'border-primary ring-1 ring-primary' : 'border-border'}`}
                 >
                   <div className="flex justify-between items-start mb-2">
                     <span className={`badge ${getStatusBadgeClass(report.status)} text-[10px]`}>
@@ -186,28 +183,28 @@ const Home = () => {
                       <Clock size={12} /> {new Date(report.created_at).toLocaleDateString()}
                     </span>
                   </div>
-                  <h3 className="font-bold text-base leading-tight mb-1 text-secondary">{report.title}</h3>
-                  <p className="text-xs text-primary font-medium mb-2">{report.category}</p>
+                  <h3 className="font-bold text-sm md:text-base leading-tight mb-1 text-secondary">{report.title}</h3>
+                  <p className="text-[10px] md:text-xs text-primary font-medium mb-2">{report.category}</p>
                   
                   {report.image_url && (
-                    <div className="mt-2 mb-3 rounded-lg overflow-hidden h-32 w-full relative">
+                    <div className="mt-2 mb-3 rounded-lg overflow-hidden h-24 md:h-32 w-full relative">
                       <img src={report.image_url} alt={report.title} className="object-cover w-full h-full" />
                     </div>
                   )}
                   
-                  <p className="text-sm text-muted line-clamp-2 mb-3 leading-relaxed">
+                  <p className="text-xs md:text-sm text-muted line-clamp-2 mb-3 leading-relaxed">
                     {report.description}
                   </p>
                   
-                  <div className="flex justify-between items-center text-xs font-medium text-secondary pt-3 border-t border-border">
+                  <div className="flex justify-between items-center text-[10px] md:text-xs font-medium text-secondary pt-3 border-t border-border">
                     <div className="flex items-center gap-1">
-                      <div className="w-5 h-5 rounded-full bg-primary-light text-primary flex items-center justify-center">
+                      <div className="w-4 h-4 md:w-5 md:h-5 rounded-full bg-primary-light text-primary flex items-center justify-center">
                         {report.user_name.charAt(0)}
                       </div>
                       {report.user_name}
                     </div>
                     <div className="flex items-center gap-1 text-primary hover:underline">
-                      <MapPin size={12} /> Ver en mapa
+                      <MapPin size={12} /> Mapa
                     </div>
                   </div>
                 </motion.div>
@@ -218,7 +215,7 @@ const Home = () => {
       </div>
 
       {/* PANEL DERECHO: Mapa */}
-      <div className="flex-grow h-full relative bg-gray-100">
+      <div className="home-map-panel">
         <MapContainer 
           center={defaultCenter} 
           zoom={13} 
@@ -227,7 +224,7 @@ const Home = () => {
         >
           <ZoomControl position="bottomright" />
           <TileLayer
-            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            attribution='&copy; OpenStreetMap contributors'
             url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
           />
           {filteredReports.map((report) => (
@@ -241,7 +238,7 @@ const Home = () => {
                 }}
               >
                 <Popup className="premium-popup">
-                  <div className="p-1" style={{ minWidth: '220px' }}>
+                  <div className="p-1" style={{ minWidth: '200px' }}>
                     <span className={`badge ${getStatusBadgeClass(report.status)} text-[10px] mb-2`}>
                       {report.status}
                     </span>
@@ -267,16 +264,15 @@ const Home = () => {
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
           transition={{ type: "spring", stiffness: 260, damping: 20, delay: 0.5 }}
-          className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-20"
-          style={{ marginLeft: '210px' }} // Offset by left panel
+          className="home-fab-container"
         >
           <button 
             onClick={() => window.location.href='/nuevo-reporte'}
-            className="flex items-center gap-2 bg-primary text-white px-6 py-3 rounded-full font-bold shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all"
+            className="flex items-center gap-2 bg-primary text-white px-5 py-3 md:px-6 md:py-3 rounded-full font-bold shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all text-sm md:text-base"
             style={{ boxShadow: '0 8px 25px rgba(5, 150, 105, 0.4)' }}
           >
             <Activity size={20} />
-            Reportar Incidente
+            Reportar
           </button>
         </motion.div>
       </div>
