@@ -11,12 +11,13 @@ const CATEGORIES = [
   'Todas',
   'Baches y pavimento dañado',
   'Luminarias en mal estado',
-  'Microbasurales y acumulación de escombros',
+  'Microbasurales',
   'Árboles caídos o peligrosos',
-  'Filtraciones de agua o alcantarillado',
-  'Animales abandonados o en riesgo',
-  'Inmuebles abandonados o peligrosos',
-  'Señalética dañada o faltante'
+  'Filtraciones de agua',
+  'Animales en riesgo',
+  'Inmuebles abandonados',
+  'Señalética dañada',
+  'Seguridad y robos'
 ];
 
 // Helper to create custom SVG colored markers
@@ -64,10 +65,13 @@ const Home = () => {
             id: 2, title: 'Luminaria rota en el parque', description: 'El parque está completamente a oscuras en el sector norte, es un peligro en la noche.', category: 'Luminarias en mal estado', status: 'en progreso', lat: -33.5169, lng: -70.6183, user_name: 'María Silva', created_at: new Date(Date.now() - 86400000).toISOString(), image_url: 'https://images.unsplash.com/photo-1519999482648-25049ddd37b1?auto=format&fit=crop&w=400&q=80'
           },
           {
-            id: 3, title: 'Basura acumulada en esquina', description: 'Vecinos han dejado escombros y basura durante el fin de semana.', category: 'Microbasurales y acumulación de escombros', status: 'resuelto', lat: -33.5389, lng: -70.5893, user_name: 'Carlos Muñoz', created_at: new Date(Date.now() - 172800000).toISOString(), image_url: 'https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?auto=format&fit=crop&w=400&q=80'
+            id: 3, title: 'Basura acumulada en esquina', description: 'Vecinos han dejado escombros y basura durante el fin de semana.', category: 'Microbasurales', status: 'resuelto', lat: -33.5389, lng: -70.5893, user_name: 'Carlos Muñoz', created_at: new Date(Date.now() - 172800000).toISOString(), image_url: 'https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?auto=format&fit=crop&w=400&q=80'
           },
           {
             id: 4, title: 'Árbol a punto de caer', description: 'Un árbol viejo está muy inclinado hacia la calle tras la última tormenta.', category: 'Árboles caídos o peligrosos', status: 'pendiente', lat: -33.5410, lng: -70.6050, user_name: 'Ana López', created_at: new Date(Date.now() - 40000000).toISOString(), image_url: 'https://images.unsplash.com/photo-1615807713086-bfc473a21b36?auto=format&fit=crop&w=400&q=80'
+          },
+          {
+            id: 5, title: 'Actividad sospechosa anoche', description: 'Sujetos rondando los autos estacionados en la calle de atrás.', category: 'Seguridad y robos', status: 'pendiente', lat: -33.5250, lng: -70.6100, user_name: 'Pedro Gómez', created_at: new Date(Date.now() - 10000000).toISOString()
           }
         ]);
         setLoading(false);

@@ -5,7 +5,7 @@ import { AuthContext } from '../context/AuthContext';
 import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
 import L from 'leaflet';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Camera, MapPin, CheckCircle, AlertCircle, UploadCloud, AlertTriangle, Lightbulb, Trash2, TreePine, Droplets, PawPrint, Home, AlertOctagon } from 'lucide-react';
+import { Camera, MapPin, CheckCircle, AlertCircle, UploadCloud, AlertTriangle, Lightbulb, Trash2, TreePine, Droplets, PawPrint, Home, AlertOctagon, ShieldAlert } from 'lucide-react';
 
 const API_URL = '/api';
 
@@ -17,7 +17,8 @@ const CATEGORIES = [
   { id: 'Filtraciones de agua', icon: Droplets },
   { id: 'Animales en riesgo', icon: PawPrint },
   { id: 'Inmuebles abandonados', icon: Home },
-  { id: 'Señalética dañada', icon: AlertOctagon }
+  { id: 'Señalética dañada', icon: AlertOctagon },
+  { id: 'Seguridad y robos', icon: ShieldAlert }
 ];
 
 function LocationMarker({ position, setPosition }) {
