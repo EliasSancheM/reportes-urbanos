@@ -2,6 +2,8 @@ import { useState, useContext } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
 import { AuthContext } from '../context/AuthContext';
+import { motion } from 'framer-motion';
+import { Mail, Lock, AlertCircle, ArrowRight } from 'lucide-react';
 
 const API_URL = '/api';
 
@@ -33,48 +35,79 @@ const Login = () => {
   };
 
   return (
-    <div style={{ maxWidth: '400px', margin: '0 auto' }}>
-      <div className="card">
-        <div className="card-header text-center">
-          <h2 className="text-2xl font-bold">Iniciar Sesión</h2>
-        </div>
-        <div className="card-body">
-          {error && <div className="text-danger mb-4 text-center">{error}</div>}
-          <form onSubmit={handleSubmit}>
-            <div className="form-group">
-              <label className="form-label" htmlFor="email">Correo Electrónico</label>
-              <input
-                type="email"
-                id="email"
-                name="email"
-                className="form-input"
-                value={formData.email}
-                onChange={handleChange}
-                required
-              />
+    <div className="flex justify-center items-center py-12 px-4 min-h-[80vh]">
+      <motion.div 
+        initial={{ opacity: 0, scale: 0.95, y: 20 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        transition={{ duration: 0.4, type: "spring" }}
+        className="w-full max-w-md"
+      >
+        <div className="bg-surface rounded-2xl shadow-xl border border-border overflow-hidden">
+          <div className="bg-gradient-to-r from-primary to-teal-600 p-8 text-center">
+            <h2 className="text-3xl font-extrabold text-white mb-2">¡Hola de nuevo!</h2>
+            <p className="text-primary-light text-sm">Ingresa a tu cuenta para reportar incidentes</p>
+          </div>
+          
+          <div className="p-8">
+            {error && (
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex items-center gap-2 bg-red-50 text-danger p-3 rounded-lg text-sm mb-6 border border-red-200">
+                <AlertCircle size={18} /> {error}
+              </motion.div>
+            )}
+
+            <form onSubmit={handleSubmit} className="space-y-5">
+              <div className="form-group mb-0 relative">
+                <label className="form-label" htmlFor="email">Correo Electrónico</label>
+                <div className="relative">
+                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted" size={18} />
+                  <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    className="form-input pl-10"
+                    placeholder="tu@correo.com"
+                    value={formData.email}
+                    onChange={handleChange}
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="form-group mb-0 relative">
+                <label className="form-label" htmlFor="password">Contraseña</label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted" size={18} />
+                  <input
+                    type="password"
+                    id="password"
+                    name="password"
+                    className="form-input pl-10"
+                    placeholder="••••••••"
+                    value={formData.password}
+                    onChange={handleChange}
+                    required
+                  />
+                </div>
+              </div>
+
+              <button 
+                type="submit" 
+                className="btn btn-primary w-full py-3 text-base mt-4 shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all" 
+                disabled={loading}
+              >
+                {loading ? 'Verificando...' : (
+                  <>Ingresar <ArrowRight size={18} /></>
+                )}
+              </button>
+            </form>
+
+            <div className="mt-8 text-center text-sm border-t border-border pt-6">
+              <span className="text-muted">¿Eres nuevo en la comuna? </span>
+              <Link to="/register" className="font-bold text-primary hover:underline">Crea una cuenta</Link>
             </div>
-            <div className="form-group">
-              <label className="form-label" htmlFor="password">Contraseña</label>
-              <input
-                type="password"
-                id="password"
-                name="password"
-                className="form-input"
-                value={formData.password}
-                onChange={handleChange}
-                required
-              />
-            </div>
-            <button type="submit" className="btn btn-primary" style={{ width: '100%', marginTop: '1rem' }} disabled={loading}>
-              {loading ? 'Cargando...' : 'Ingresar'}
-            </button>
-          </form>
-          <div className="text-center mt-4 text-sm">
-            <span className="text-muted">¿No tienes cuenta? </span>
-            <Link to="/register" className="font-semibold text-primary">Regístrate</Link>
           </div>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 };
