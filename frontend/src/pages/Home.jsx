@@ -3,6 +3,7 @@ import axios from 'axios';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
 import { Filter } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 const API_URL = '/api';
 
@@ -93,15 +94,50 @@ const Home = () => {
 
   const defaultCenter = [-33.4489, -70.6693];
 
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1
+      }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 30 },
+    show: { 
+      opacity: 1, 
+      y: 0, 
+      transition: { type: "spring", stiffness: 300, damping: 24 } 
+    }
+  };
+
   return (
-    <div className="flex flex-col gap-6">
-      <div className="text-center">
+    <motion.div 
+      initial={{ opacity: 0 }} 
+      animate={{ opacity: 1 }} 
+      transition={{ duration: 0.5 }}
+      className="flex flex-col gap-6"
+    >
+      <motion.div 
+        initial={{ y: -20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ delay: 0.1, duration: 0.5 }}
+        className="text-center"
+      >
         <h1 className="text-3xl font-bold mb-2">Reportes Ciudadanos</h1>
         <p className="text-muted">Explora los problemas urbanos reportados en tu comunidad</p>
-      </div>
+      </motion.div>
 
       {/* Filters Section */}
-      <div className="card p-4 flex flex-col md:flex-row gap-4 items-center justify-between" style={{ backgroundColor: 'var(--surface)' }}>
+      <motion.div 
+        initial={{ scale: 0.95, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        transition={{ delay: 0.2, duration: 0.4 }}
+        className="card p-4 flex flex-col md:flex-row gap-4 items-center justify-between" 
+        style={{ backgroundColor: 'var(--surface)' }}
+      >
         <div className="flex items-center gap-2 font-semibold text-primary">
           <Filter size={20} />
           <span>Filtros Rápidos:</span>
@@ -128,9 +164,14 @@ const Home = () => {
             <option value="resuelto">Resueltos (Verde)</option>
           </select>
         </div>
-      </div>
+      </motion.div>
 
-      <div className="card">
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.3, duration: 0.5 }}
+        className="card"
+      >
         <div className="card-header flex justify-between items-center">
           <h2 className="text-xl font-semibold">Mapa de Incidentes</h2>
           <span className="text-sm text-muted">Mostrando {filteredReports.length} reportes</span>
@@ -169,18 +210,34 @@ const Home = () => {
             ))}
           </MapContainer>
         </div>
-      </div>
+      </motion.div>
 
       <div>
         <h2 className="text-2xl font-bold mb-4">Listado de Reportes</h2>
         {filteredReports.length === 0 ? (
-          <div className="text-center p-8 border" style={{ borderRadius: 'var(--radius-lg)', borderColor: 'var(--border)' }}>
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="text-center p-8 border" 
+            style={{ borderRadius: 'var(--radius-lg)', borderColor: 'var(--border)' }}
+          >
             <p className="text-muted text-lg">No se encontraron reportes con los filtros seleccionados.</p>
-          </div>
+          </motion.div>
         ) : (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '1.5rem' }}>
+          <motion.div 
+            variants={containerVariants}
+            initial="hidden"
+            animate="show"
+            style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '1.5rem' }}
+          >
             {filteredReports.map((report) => (
-              <div key={report.id} className="card">
+              <motion.div 
+                key={report.id} 
+                variants={itemVariants}
+                whileHover={{ y: -8, scale: 1.02, boxShadow: 'var(--shadow-lg)' }}
+                transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                className="card"
+              >
                 {report.image_url && (
                   <img 
                     src={report.image_url} 
@@ -204,12 +261,12 @@ const Home = () => {
                     <span>{new Date(report.created_at).toLocaleDateString()}</span>
                   </div>
                 </div>
-              </div>
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
         )}
       </div>
-    </div>
+    </motion.div>
   );
 };
 
