@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
-import { MapContainer, TileLayer, Marker, Popup, ZoomControl } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Popup, ZoomControl, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import { Filter, Search, MapPin, Activity, Clock, CheckCircle, Plus } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -39,6 +39,18 @@ const icons = {
   'en progreso': createIcon('#f59e0b'), // Amarillo
   'resuelto': createIcon('#10b981')     // Verde
 };
+
+function MapFixer() {
+  const map = useMap();
+  useEffect(() => {
+    // Timeout ensures the container has settled before invalidating size
+    const timer = setTimeout(() => {
+      map.invalidateSize();
+    }, 400);
+    return () => clearTimeout(timer);
+  }, [map]);
+  return null;
+}
 
 const Home = () => {
   const [reports, setReports] = useState([]);
@@ -100,7 +112,7 @@ const Home = () => {
   });
 
   if (loading) return (
-    <div className="flex justify-center items-center h-full w-full">
+    <div style={{ gridColumn: '1 / -1', gridRow: '1 / -1' }} className="flex justify-center items-center h-full w-full bg-background">
       <motion.div 
         animate={{ rotate: 360 }}
         transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
@@ -109,7 +121,7 @@ const Home = () => {
     </div>
   );
 
-  if (error) return <div className="text-center mt-8 text-danger font-semibold">{error}</div>;
+  if (error) return <div style={{ gridColumn: '1 / -1', gridRow: '1 / -1' }} className="text-center mt-8 text-danger font-semibold">{error}</div>;
 
   // Centro de La Florida aprox
   const defaultCenter = [-33.5289, -70.5983];
@@ -121,7 +133,7 @@ const Home = () => {
         <div className="p-4 md:p-5 border-b border-border bg-surface sticky top-0 z-20">
           <div className="flex justify-between items-center mb-3">
             <div>
-              <h1 className="text-xl md:text-2xl font-extrabold text-secondary leading-none mb-1">Incidentes</h1>
+              <h1 className="text-xl md:text-2xl font-extrabold text-secondary leading-none mb-1">Problemas Reportados</h1>
               <p className="text-[10px] md:text-xs text-muted">Descubre lo que ocurre en tu barrio</p>
             </div>
             <Link 
@@ -234,6 +246,7 @@ const Home = () => {
           zoomControl={false}
           style={{ height: '100%', width: '100%' }}
         >
+          <MapFixer />
           <ZoomControl position="bottomright" />
           <TileLayer
             attribution='&copy; OpenStreetMap contributors'

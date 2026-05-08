@@ -112,7 +112,7 @@ const AdminDashboard = () => {
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div>
             <h1 className="text-3xl font-extrabold text-secondary mb-1">Centro de Control</h1>
-            <p className="text-muted">Gestión general de incidentes y requerimientos ciudadanos.</p>
+            <p className="text-muted">Gestión general de problemas y requerimientos ciudadanos.</p>
           </div>
           <div className="bg-primary-light text-primary px-4 py-2 rounded-full font-bold text-sm shadow-sm border border-primary">
             Administrador Municipal

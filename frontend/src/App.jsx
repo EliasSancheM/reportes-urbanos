@@ -3,6 +3,7 @@ import Navbar from './components/Navbar';
 import Home from './pages/Home';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import Verify from './pages/Verify';
 import NewReport from './pages/NewReport';
 import AdminDashboard from './pages/AdminDashboard';
 import MyReports from './pages/MyReports';
@@ -30,6 +31,7 @@ function App() {
               <Route path="/" element={<Home />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
+              <Route path="/verify/:token" element={<Verify />} />
               <Route path="/nuevo-reporte" element={<NewReport />} />
               <Route path="/mis-reportes" element={<MyReports />} />
               <Route path="/admin" element={<AdminDashboard />} />

@@ -119,7 +119,7 @@ const NewReport = () => {
     >
       <div className="mb-8 text-center">
         <h1 className="text-3xl font-extrabold text-secondary mb-2">Crear Nuevo Reporte</h1>
-        <p className="text-muted">Ayúdanos a mejorar nuestra comuna reportando incidentes</p>
+        <p className="text-muted">Ayúdanos a mejorar nuestra comuna reportando problemas</p>
       </div>
 
       <AnimatePresence>
@@ -143,7 +143,7 @@ const NewReport = () => {
           <div className="flex-1 p-6 md:p-8 border-b md:border-b-0 md:border-r border-border">
             <h3 className="text-lg font-bold text-secondary mb-6 flex items-center gap-2">
               <span className="w-8 h-8 rounded-full bg-primary-light text-primary flex items-center justify-center">1</span>
-              Detalles del Incidente
+              Detalles del Problema
             </h3>
 
             <div className="form-group mb-6">
@@ -233,7 +233,7 @@ const NewReport = () => {
               Ubicación Exacta
             </h3>
             
-            <p className="text-sm text-muted mb-4">Navega por el mapa y haz clic en el punto exacto donde ocurre el incidente.</p>
+            <p className="text-sm text-muted mb-4">Navega por el mapa y haz clic en el punto exacto donde ocurre el problema.</p>
             
             <div className="w-full rounded-xl overflow-hidden shadow-inner border border-border relative h-[350px] md:h-[500px]">
               <MapContainer center={[-33.5289, -70.5983]} zoom={14} style={{ height: '100%', width: '100%' }}>
