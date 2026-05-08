@@ -2,6 +2,7 @@ import { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
 import { AuthContext } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
 
 const API_URL = '/api';
 
@@ -59,8 +60,26 @@ const AdminDashboard = () => {
   if (loading) return <div className="text-center mt-8">Cargando panel de administración...</div>;
   if (error) return <div className="text-center mt-8 text-danger">{error}</div>;
 
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: { staggerChildren: 0.05 }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, x: -20 },
+    show: { opacity: 1, x: 0, transition: { type: "spring", stiffness: 300, damping: 24 } }
+  };
+
   return (
-    <div className="flex flex-col gap-6">
+    <motion.div 
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      className="flex flex-col gap-6"
+    >
       <div className="flex justify-between items-center mb-4">
         <div>
           <h1 className="text-3xl font-bold mb-2">Panel de Gestión Municipal</h1>
@@ -84,9 +103,18 @@ const AdminDashboard = () => {
                 <th className="p-4 font-semibold">Acciones</th>
               </tr>
             </thead>
-            <tbody>
+            <motion.tbody
+              variants={containerVariants}
+              initial="hidden"
+              animate="show"
+            >
               {reports.map((report) => (
-                <tr key={report.id} style={{ borderBottom: '1px solid var(--border)' }}>
+                <motion.tr 
+                  key={report.id} 
+                  variants={itemVariants}
+                  whileHover={{ backgroundColor: 'rgba(0,0,0,0.02)' }}
+                  style={{ borderBottom: '1px solid var(--border)' }}
+                >
                   <td className="p-4">#{report.id}</td>
                   <td className="p-4">
                     <div className="font-bold">{report.title}</div>
@@ -111,18 +139,18 @@ const AdminDashboard = () => {
                       <option value="resuelto">Resuelto</option>
                     </select>
                   </td>
-                </tr>
+                </motion.tr>
               ))}
               {reports.length === 0 && (
-                <tr>
+                <motion.tr variants={itemVariants}>
                   <td colSpan="6" className="p-4 text-center text-muted">No hay reportes disponibles.</td>
-                </tr>
+                </motion.tr>
               )}
-            </tbody>
+            </motion.tbody>
           </table>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 };
 
