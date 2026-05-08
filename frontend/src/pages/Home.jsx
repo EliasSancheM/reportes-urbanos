@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Popup, ZoomControl } from 'react-leaflet';
 import L from 'leaflet';
-import { Filter } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { Filter, Search, MapPin, Activity, Clock, CheckCircle } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const API_URL = '/api';
 
@@ -23,12 +23,12 @@ const CATEGORIES = [
 const createIcon = (color) => {
   return L.divIcon({
     className: 'custom-leaflet-icon',
-    html: `<svg width="24" height="36" viewBox="0 0 24 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+    html: `<svg width="32" height="48" viewBox="0 0 24 36" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M12 0C5.37 0 0 5.37 0 12c0 9 12 24 12 24s12-15 12-24c0-6.63-5.37-12-12-12zm0 16.5c-2.48 0-4.5-2.02-4.5-4.5S9.52 7.5 12 7.5s4.5 2.02 4.5 4.5-2.02 4.5-4.5 4.5z" fill="${color}"/>
            </svg>`,
-    iconSize: [24, 36],
-    iconAnchor: [12, 36],
-    popupAnchor: [0, -36]
+    iconSize: [32, 48],
+    iconAnchor: [16, 48],
+    popupAnchor: [0, -48]
   });
 };
 
@@ -43,9 +43,10 @@ const Home = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   
-  // States for filters
   const [filterCategory, setFilterCategory] = useState('Todas');
   const [filterStatus, setFilterStatus] = useState('Todos');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [activeReportId, setActiveReportId] = useState(null);
 
   useEffect(() => {
     const fetchReports = async () => {
@@ -57,13 +58,16 @@ const Home = () => {
         console.warn('Backend not available, using mock data for demonstration.');
         setReports([
           {
-            id: 1, title: 'Bache gigante en la calle principal', description: 'Hay un bache profundo...', category: 'Baches y pavimento dañado', status: 'pendiente', lat: -33.4489, lng: -70.6693, user_name: 'Juan Pérez', created_at: new Date().toISOString(), image_url: 'https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?auto=format&fit=crop&w=400&q=80'
+            id: 1, title: 'Bache gigante en la calle principal', description: 'Hay un bache profundo que está dañando los autos que pasan. Se necesita reparación urgente.', category: 'Baches y pavimento dañado', status: 'pendiente', lat: -33.5229, lng: -70.5983, user_name: 'Juan Pérez', created_at: new Date().toISOString(), image_url: 'https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?auto=format&fit=crop&w=400&q=80'
           },
           {
-            id: 2, title: 'Luminaria rota en el parque', description: 'El parque está completamente a oscuras...', category: 'Luminarias en mal estado', status: 'en progreso', lat: -33.4569, lng: -70.6483, user_name: 'María Silva', created_at: new Date(Date.now() - 86400000).toISOString(), image_url: 'https://images.unsplash.com/photo-1519999482648-25049ddd37b1?auto=format&fit=crop&w=400&q=80'
+            id: 2, title: 'Luminaria rota en el parque', description: 'El parque está completamente a oscuras en el sector norte, es un peligro en la noche.', category: 'Luminarias en mal estado', status: 'en progreso', lat: -33.5169, lng: -70.6183, user_name: 'María Silva', created_at: new Date(Date.now() - 86400000).toISOString(), image_url: 'https://images.unsplash.com/photo-1519999482648-25049ddd37b1?auto=format&fit=crop&w=400&q=80'
           },
           {
-            id: 3, title: 'Basura acumulada en esquina', description: 'Vecinos han dejado escombros...', category: 'Microbasurales y acumulación de escombros', status: 'resuelto', lat: -33.4389, lng: -70.6593, user_name: 'Carlos Muñoz', created_at: new Date(Date.now() - 172800000).toISOString(), image_url: 'https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?auto=format&fit=crop&w=400&q=80'
+            id: 3, title: 'Basura acumulada en esquina', description: 'Vecinos han dejado escombros y basura durante el fin de semana.', category: 'Microbasurales y acumulación de escombros', status: 'resuelto', lat: -33.5389, lng: -70.5893, user_name: 'Carlos Muñoz', created_at: new Date(Date.now() - 172800000).toISOString(), image_url: 'https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?auto=format&fit=crop&w=400&q=80'
+          },
+          {
+            id: 4, title: 'Árbol a punto de caer', description: 'Un árbol viejo está muy inclinado hacia la calle tras la última tormenta.', category: 'Árboles caídos o peligrosos', status: 'pendiente', lat: -33.5410, lng: -70.6050, user_name: 'Ana López', created_at: new Date(Date.now() - 40000000).toISOString(), image_url: 'https://images.unsplash.com/photo-1615807713086-bfc473a21b36?auto=format&fit=crop&w=400&q=80'
           }
         ]);
         setLoading(false);
@@ -82,191 +86,197 @@ const Home = () => {
     }
   };
 
-  // Filter logic
   const filteredReports = reports.filter(report => {
     const matchCategory = filterCategory === 'Todas' || report.category === filterCategory;
     const matchStatus = filterStatus === 'Todos' || report.status === filterStatus;
-    return matchCategory && matchStatus;
+    const matchSearch = report.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                        report.description.toLowerCase().includes(searchQuery.toLowerCase());
+    return matchCategory && matchStatus && matchSearch;
   });
 
-  if (loading) return <div className="text-center mt-8 text-lg font-medium text-primary">Cargando reportes en vivo...</div>;
-  if (error) return <div className="text-center mt-8 text-danger">{error}</div>;
+  if (loading) return (
+    <div className="flex justify-center items-center h-full w-full">
+      <motion.div 
+        animate={{ rotate: 360 }}
+        transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
+        className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full"
+      />
+    </div>
+  );
 
-  const defaultCenter = [-33.4489, -70.6693];
+  if (error) return <div className="text-center mt-8 text-danger font-semibold">{error}</div>;
 
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    show: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1
-      }
-    }
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 30 },
-    show: { 
-      opacity: 1, 
-      y: 0, 
-      transition: { type: "spring", stiffness: 300, damping: 24 } 
-    }
-  };
+  // Centro de La Florida aprox
+  const defaultCenter = [-33.5289, -70.5983];
 
   return (
-    <motion.div 
-      initial={{ opacity: 0 }} 
-      animate={{ opacity: 1 }} 
-      transition={{ duration: 0.5 }}
-      className="flex flex-col gap-6"
-    >
-      <motion.div 
-        initial={{ y: -20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 0.1, duration: 0.5 }}
-        className="text-center"
+    <>
+      {/* PANEL IZQUIERDO: Feed de Reportes */}
+      <div 
+        className="flex flex-col bg-surface border-r border-border shadow-xl z-10" 
+        style={{ width: '420px', flexShrink: 0, height: '100%', position: 'relative' }}
       >
-        <h1 className="text-3xl font-bold mb-2">Reportes Ciudadanos</h1>
-        <p className="text-muted">Explora los problemas urbanos reportados en tu comunidad</p>
-      </motion.div>
-
-      {/* Filters Section */}
-      <motion.div 
-        initial={{ scale: 0.95, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        transition={{ delay: 0.2, duration: 0.4 }}
-        className="card p-4 flex flex-col md:flex-row gap-4 items-center justify-between" 
-        style={{ backgroundColor: 'var(--surface)' }}
-      >
-        <div className="flex items-center gap-2 font-semibold text-primary">
-          <Filter size={20} />
-          <span>Filtros Rápidos:</span>
-        </div>
-        <div className="flex flex-wrap gap-4" style={{ flex: 1, justifyContent: 'flex-end' }}>
-          <select 
-            className="form-select" 
-            style={{ width: 'auto', minWidth: '200px' }}
-            value={filterCategory}
-            onChange={(e) => setFilterCategory(e.target.value)}
-          >
-            {CATEGORIES.map(cat => <option key={cat} value={cat}>{cat}</option>)}
-          </select>
-
-          <select 
-            className="form-select" 
-            style={{ width: 'auto' }}
-            value={filterStatus}
-            onChange={(e) => setFilterStatus(e.target.value)}
-          >
-            <option value="Todos">Todos los Estados</option>
-            <option value="pendiente">Solo Pendientes (Rojo)</option>
-            <option value="en progreso">En Progreso (Amarillo)</option>
-            <option value="resuelto">Resueltos (Verde)</option>
-          </select>
-        </div>
-      </motion.div>
-
-      <motion.div 
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.3, duration: 0.5 }}
-        className="card"
-      >
-        <div className="card-header flex justify-between items-center">
-          <h2 className="text-xl font-semibold">Mapa de Incidentes</h2>
-          <span className="text-sm text-muted">Mostrando {filteredReports.length} reportes</span>
-        </div>
-        <div className="map-container">
-          <MapContainer center={defaultCenter} zoom={12} style={{ height: '100%', width: '100%' }}>
-            <TileLayer
-              attribution='&copy; OpenStreetMap'
-              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        <div className="p-5 border-b border-border bg-surface sticky top-0 z-20">
+          <h1 className="text-2xl font-extrabold text-secondary mb-1">Incidentes</h1>
+          <p className="text-sm text-muted mb-4">Descubre lo que ocurre en tu barrio</p>
+          
+          <div className="form-group relative mb-3">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted" size={18} />
+            <input 
+              type="text" 
+              className="form-input pl-10 bg-background" 
+              placeholder="Buscar reportes..." 
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
             />
-            {filteredReports.map((report) => (
-              report.lat && report.lng && (
-                <Marker 
-                  key={report.id} 
-                  position={[report.lat, report.lng]}
-                  icon={icons[report.status] || icons['pendiente']}
-                >
-                  <Popup>
-                    <div style={{ minWidth: '200px' }}>
-                      <h3 className="font-bold">{report.title}</h3>
-                      <p className="text-sm text-muted mb-2">{report.category}</p>
-                      <span className={`badge ${getStatusBadgeClass(report.status)}`}>
-                        {report.status}
-                      </span>
-                      {report.image_url && (
-                        <img 
-                          src={report.image_url} 
-                          alt={report.title} 
-                          style={{ width: '100%', height: '120px', objectFit: 'cover', marginTop: '8px', borderRadius: '4px' }} 
-                        />
-                      )}
-                    </div>
-                  </Popup>
-                </Marker>
-              )
-            ))}
-          </MapContainer>
-        </div>
-      </motion.div>
+          </div>
+          
+          <div className="flex gap-2">
+            <select 
+              className="form-select text-xs py-2 bg-background" 
+              value={filterCategory}
+              onChange={(e) => setFilterCategory(e.target.value)}
+            >
+              {CATEGORIES.map(cat => <option key={cat} value={cat}>{cat}</option>)}
+            </select>
 
-      <div>
-        <h2 className="text-2xl font-bold mb-4">Listado de Reportes</h2>
-        {filteredReports.length === 0 ? (
-          <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="text-center p-8 border" 
-            style={{ borderRadius: 'var(--radius-lg)', borderColor: 'var(--border)' }}
-          >
-            <p className="text-muted text-lg">No se encontraron reportes con los filtros seleccionados.</p>
-          </motion.div>
-        ) : (
-          <motion.div 
-            variants={containerVariants}
-            initial="hidden"
-            animate="show"
-            style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '1.5rem' }}
-          >
-            {filteredReports.map((report) => (
+            <select 
+              className="form-select text-xs py-2 bg-background" 
+              value={filterStatus}
+              onChange={(e) => setFilterStatus(e.target.value)}
+            >
+              <option value="Todos">Todos</option>
+              <option value="pendiente">Pendientes</option>
+              <option value="en progreso">En Progreso</option>
+              <option value="resuelto">Resueltos</option>
+            </select>
+          </div>
+        </div>
+
+        <div className="flex-1 overflow-y-auto p-4 space-y-4" style={{ backgroundColor: '#f8fafc' }}>
+          <AnimatePresence>
+            {filteredReports.length === 0 ? (
               <motion.div 
-                key={report.id} 
-                variants={itemVariants}
-                whileHover={{ y: -8, scale: 1.02, boxShadow: 'var(--shadow-lg)' }}
-                transition={{ type: "spring", stiffness: 400, damping: 25 }}
-                className="card"
+                initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                className="text-center p-8 text-muted"
               >
-                {report.image_url && (
-                  <img 
-                    src={report.image_url} 
-                    alt={report.title} 
-                    style={{ width: '100%', height: '200px', objectFit: 'cover' }} 
-                  />
-                )}
-                <div className="card-body">
+                No se encontraron reportes.
+              </motion.div>
+            ) : (
+              filteredReports.map((report) => (
+                <motion.div 
+                  key={report.id}
+                  layout
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.9 }}
+                  whileHover={{ y: -2, boxShadow: 'var(--shadow-md)' }}
+                  onClick={() => setActiveReportId(report.id)}
+                  className={`bg-surface rounded-xl border p-4 cursor-pointer transition-colors ${activeReportId === report.id ? 'border-primary ring-1 ring-primary' : 'border-border'}`}
+                >
                   <div className="flex justify-between items-start mb-2">
-                    <h3 className="font-bold text-lg">{report.title}</h3>
-                    <span className={`badge ${getStatusBadgeClass(report.status)}`}>
+                    <span className={`badge ${getStatusBadgeClass(report.status)} text-[10px]`}>
                       {report.status}
                     </span>
+                    <span className="text-xs text-muted flex items-center gap-1">
+                      <Clock size={12} /> {new Date(report.created_at).toLocaleDateString()}
+                    </span>
                   </div>
-                  <p className="text-sm text-muted mb-3 font-medium">{report.category}</p>
-                  <p className="text-sm mb-4" style={{ display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                  <h3 className="font-bold text-base leading-tight mb-1 text-secondary">{report.title}</h3>
+                  <p className="text-xs text-primary font-medium mb-2">{report.category}</p>
+                  
+                  {report.image_url && (
+                    <div className="mt-2 mb-3 rounded-lg overflow-hidden h-32 w-full relative">
+                      <img src={report.image_url} alt={report.title} className="object-cover w-full h-full" />
+                    </div>
+                  )}
+                  
+                  <p className="text-sm text-muted line-clamp-2 mb-3 leading-relaxed">
                     {report.description}
                   </p>
-                  <div className="flex justify-between text-xs text-muted">
-                    <span>Reportado por: {report.user_name}</span>
-                    <span>{new Date(report.created_at).toLocaleDateString()}</span>
+                  
+                  <div className="flex justify-between items-center text-xs font-medium text-secondary pt-3 border-t border-border">
+                    <div className="flex items-center gap-1">
+                      <div className="w-5 h-5 rounded-full bg-primary-light text-primary flex items-center justify-center">
+                        {report.user_name.charAt(0)}
+                      </div>
+                      {report.user_name}
+                    </div>
+                    <div className="flex items-center gap-1 text-primary hover:underline">
+                      <MapPin size={12} /> Ver en mapa
+                    </div>
                   </div>
-                </div>
-              </motion.div>
-            ))}
-          </motion.div>
-        )}
+                </motion.div>
+              ))
+            )}
+          </AnimatePresence>
+        </div>
       </div>
-    </motion.div>
+
+      {/* PANEL DERECHO: Mapa */}
+      <div className="flex-grow h-full relative bg-gray-100">
+        <MapContainer 
+          center={defaultCenter} 
+          zoom={13} 
+          zoomControl={false}
+          style={{ height: '100%', width: '100%' }}
+        >
+          <ZoomControl position="bottomright" />
+          <TileLayer
+            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
+          />
+          {filteredReports.map((report) => (
+            report.lat && report.lng && (
+              <Marker 
+                key={report.id} 
+                position={[report.lat, report.lng]}
+                icon={icons[report.status] || icons['pendiente']}
+                eventHandlers={{
+                  click: () => setActiveReportId(report.id),
+                }}
+              >
+                <Popup className="premium-popup">
+                  <div className="p-1" style={{ minWidth: '220px' }}>
+                    <span className={`badge ${getStatusBadgeClass(report.status)} text-[10px] mb-2`}>
+                      {report.status}
+                    </span>
+                    <h3 className="font-bold text-sm leading-tight mb-1">{report.title}</h3>
+                    <p className="text-xs text-muted mb-2">{report.category}</p>
+                    {report.image_url && (
+                      <img 
+                        src={report.image_url} 
+                        alt={report.title} 
+                        className="w-full h-24 object-cover rounded-md mb-2"
+                      />
+                    )}
+                    <button className="w-full btn btn-primary py-1 text-xs mt-1">Ver detalles</button>
+                  </div>
+                </Popup>
+              </Marker>
+            )
+          ))}
+        </MapContainer>
+
+        {/* Floating Action Button for New Report (Mobile/Desktop overlay) */}
+        <motion.div 
+          initial={{ scale: 0 }}
+          animate={{ scale: 1 }}
+          transition={{ type: "spring", stiffness: 260, damping: 20, delay: 0.5 }}
+          className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-20"
+          style={{ marginLeft: '210px' }} // Offset by left panel
+        >
+          <button 
+            onClick={() => window.location.href='/nuevo-reporte'}
+            className="flex items-center gap-2 bg-primary text-white px-6 py-3 rounded-full font-bold shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all"
+            style={{ boxShadow: '0 8px 25px rgba(5, 150, 105, 0.4)' }}
+          >
+            <Activity size={20} />
+            Reportar Incidente
+          </button>
+        </motion.div>
+      </div>
+    </>
   );
 };
 
