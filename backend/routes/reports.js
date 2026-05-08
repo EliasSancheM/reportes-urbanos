@@ -113,4 +113,33 @@ router.put('/:id/status', authMiddleware, async (req, res) => {
   }
 });
 
+// Eliminar un reporte (solo admin o el propio creador)
+router.delete('/:id', authMiddleware, async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    let query, values;
+    if (req.user.role === 'admin') {
+      // El admin puede eliminar cualquiera
+      query = 'DELETE FROM reports WHERE id = $1 RETURNING *';
+      values = [id];
+    } else {
+      // El usuario solo puede eliminar los suyos
+      query = 'DELETE FROM reports WHERE id = $1 AND user_id = $2 RETURNING *';
+      values = [id, req.user.id];
+    }
+
+    const result = await pool.query(query, values);
+    
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Reporte no encontrado o no tienes permisos para eliminarlo' });
+    }
+
+    res.json({ message: 'Reporte eliminado exitosamente', id });
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Error en el servidor');
+  }
+});
+
 module.exports = router;

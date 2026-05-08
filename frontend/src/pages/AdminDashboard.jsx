@@ -3,6 +3,7 @@ import axios from 'axios';
 import { AuthContext } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { Trash2 } from 'lucide-react';
 
 const API_URL = '/api';
 
@@ -45,6 +46,22 @@ const AdminDashboard = () => {
       setReports(reports.map(report => report.id === id ? { ...report, status: newStatus } : report));
     } catch (err) {
       alert('Error al actualizar el estado');
+    }
+  };
+
+  const handleDelete = async (id) => {
+    if (!window.confirm('¿Estás seguro de que quieres eliminar este reporte para siempre?')) return;
+    
+    try {
+      await axios.delete(`${API_URL}/reports/${id}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      // Eliminar del estado local
+      setReports(reports.filter(report => report.id !== id));
+    } catch (err) {
+      alert('Error al eliminar el reporte');
     }
   };
 
@@ -127,7 +144,7 @@ const AdminDashboard = () => {
                       {report.status}
                     </span>
                   </td>
-                  <td className="p-4">
+                  <td className="p-4 flex gap-2 items-center">
                     <select 
                       className="form-select" 
                       style={{ padding: '0.25rem 0.5rem', width: 'auto' }}
@@ -138,6 +155,17 @@ const AdminDashboard = () => {
                       <option value="en progreso">En Progreso</option>
                       <option value="resuelto">Resuelto</option>
                     </select>
+                    
+                    {report.status === 'resuelto' && (
+                      <button 
+                        onClick={() => handleDelete(report.id)}
+                        className="btn btn-outline p-2 hover:bg-red-50" 
+                        style={{ color: 'var(--danger)', borderColor: 'var(--danger)', padding: '0.4rem' }}
+                        title="Eliminar reporte resuelto"
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    )}
                   </td>
                 </motion.tr>
               ))}
