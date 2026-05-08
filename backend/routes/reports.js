@@ -32,6 +32,24 @@ router.get('/', async (req, res) => {
   }
 });
 
+// Obtener reportes del usuario autenticado
+router.get('/me', authMiddleware, async (req, res) => {
+  try {
+    const query = `
+      SELECT r.*, u.name as user_name
+      FROM reports r 
+      JOIN users u ON r.user_id = u.id
+      WHERE r.user_id = $1
+      ORDER BY r.created_at DESC
+    `;
+    const result = await pool.query(query, [req.user.id]);
+    res.json(result.rows);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Error en el servidor');
+  }
+});
+
 // Crear un reporte
 router.post('/', authMiddleware, upload.single('image'), async (req, res) => {
   const { title, description, category, lat, lng } = req.body;

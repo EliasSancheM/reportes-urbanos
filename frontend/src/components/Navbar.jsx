@@ -1,7 +1,7 @@
 import { useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
-import { MapPin, LogOut, User, PlusCircle, Settings } from 'lucide-react';
+import { MapPin, LogOut, User, PlusCircle, Settings, FileText } from 'lucide-react';
 
 const Navbar = () => {
   const { user, logout } = useContext(AuthContext);
@@ -22,6 +22,10 @@ const Navbar = () => {
         <div className="flex items-center gap-4">
           {user ? (
             <>
+              <Link to="/mis-reportes" className="btn btn-outline" style={{ color: 'var(--primary)', borderColor: 'var(--primary)' }}>
+                <FileText size={18} />
+                Mis Reportes
+              </Link>
               <Link to="/nuevo-reporte" className="btn btn-primary">
                 <PlusCircle size={18} />
                 Nuevo Reporte

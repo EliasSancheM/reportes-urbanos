@@ -5,6 +5,7 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import NewReport from './pages/NewReport';
 import AdminDashboard from './pages/AdminDashboard';
+import MyReports from './pages/MyReports';
 import { AuthProvider } from './context/AuthContext';
 
 function App() {
@@ -19,6 +20,7 @@ function App() {
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
               <Route path="/nuevo-reporte" element={<NewReport />} />
+              <Route path="/mis-reportes" element={<MyReports />} />
               <Route path="/admin" element={<AdminDashboard />} />
               <Route path="*" element={<Navigate to="/" />} />
             </Routes>
