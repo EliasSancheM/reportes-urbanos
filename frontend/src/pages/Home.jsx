@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
+import { Link } from 'react-router-dom';
 import { MapContainer, TileLayer, Marker, Popup, ZoomControl } from 'react-leaflet';
 import L from 'leaflet';
-import { Filter, Search, MapPin, Activity, Clock, CheckCircle } from 'lucide-react';
+import { Filter, Search, MapPin, Activity, Clock, CheckCircle, Plus } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const API_URL = '/api';
@@ -118,8 +119,19 @@ const Home = () => {
       {/* PANEL IZQUIERDO: Feed de Reportes */}
       <div className="home-feed-panel">
         <div className="p-4 md:p-5 border-b border-border bg-surface sticky top-0 z-20">
-          <h1 className="text-xl md:text-2xl font-extrabold text-secondary mb-1">Incidentes</h1>
-          <p className="text-xs md:text-sm text-muted mb-3 md:mb-4">Descubre lo que ocurre en tu barrio</p>
+          <div className="flex justify-between items-center mb-3">
+            <div>
+              <h1 className="text-xl md:text-2xl font-extrabold text-secondary leading-none mb-1">Incidentes</h1>
+              <p className="text-[10px] md:text-xs text-muted">Descubre lo que ocurre en tu barrio</p>
+            </div>
+            <Link 
+              to="/nuevo-reporte"
+              className="flex items-center gap-1.5 bg-primary text-white px-3 py-2 rounded-lg font-bold shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all text-xs md:text-sm"
+            >
+              <Plus size={16} />
+              Reportar
+            </Link>
+          </div>
           
           <div className="form-group relative mb-3">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted" size={18} />
@@ -258,23 +270,6 @@ const Home = () => {
             )
           ))}
         </MapContainer>
-
-        {/* Floating Action Button for New Report (Mobile/Desktop overlay) */}
-        <motion.div 
-          initial={{ scale: 0 }}
-          animate={{ scale: 1 }}
-          transition={{ type: "spring", stiffness: 260, damping: 20, delay: 0.5 }}
-          className="home-fab-container"
-        >
-          <button 
-            onClick={() => window.location.href='/nuevo-reporte'}
-            className="flex items-center gap-2 bg-primary text-white px-5 py-3 md:px-6 md:py-3 rounded-full font-bold shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all text-sm md:text-base"
-            style={{ boxShadow: '0 8px 25px rgba(5, 150, 105, 0.4)' }}
-          >
-            <Activity size={20} />
-            Reportar
-          </button>
-        </motion.div>
       </div>
     </>
   );
