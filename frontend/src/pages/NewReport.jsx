@@ -5,19 +5,19 @@ import { AuthContext } from '../context/AuthContext';
 import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
 import L from 'leaflet';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Camera, MapPin, CheckCircle, AlertCircle, UploadCloud } from 'lucide-react';
+import { Camera, MapPin, CheckCircle, AlertCircle, UploadCloud, AlertTriangle, Lightbulb, Trash2, TreePine, Droplets, PawPrint, Home, AlertOctagon } from 'lucide-react';
 
 const API_URL = '/api';
 
 const CATEGORIES = [
-  'Baches y pavimento dañado',
-  'Luminarias en mal estado',
-  'Microbasurales',
-  'Árboles caídos o peligrosos',
-  'Filtraciones de agua',
-  'Animales en riesgo',
-  'Inmuebles abandonados',
-  'Señalética dañada'
+  { id: 'Baches y pavimento dañado', icon: AlertTriangle },
+  { id: 'Luminarias en mal estado', icon: Lightbulb },
+  { id: 'Microbasurales', icon: Trash2 },
+  { id: 'Árboles caídos o peligrosos', icon: TreePine },
+  { id: 'Filtraciones de agua', icon: Droplets },
+  { id: 'Animales en riesgo', icon: PawPrint },
+  { id: 'Inmuebles abandonados', icon: Home },
+  { id: 'Señalética dañada', icon: AlertOctagon }
 ];
 
 function LocationMarker({ position, setPosition }) {
@@ -48,7 +48,7 @@ const NewReport = () => {
   const [formData, setFormData] = useState({
     title: '',
     description: '',
-    category: CATEGORIES[0],
+    category: CATEGORIES[0].id,
   });
   const [position, setPosition] = useState(null);
   const [image, setImage] = useState(null);
@@ -161,21 +161,25 @@ const NewReport = () => {
 
             <div className="form-group mb-6">
               <label className="form-label mb-3 block">Categoría del problema</label>
-              <div className="flex flex-wrap gap-2">
-                {CATEGORIES.map(cat => (
+              <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 gap-3">
+                {CATEGORIES.map(cat => {
+                  const Icon = cat.icon;
+                  return (
                   <button
-                    key={cat}
+                    key={cat.id}
                     type="button"
-                    onClick={() => setFormData({...formData, category: cat})}
-                    className={`px-4 py-2 rounded-full text-sm font-medium transition-all border ${
-                      formData.category === cat 
-                      ? 'bg-primary text-white border-primary shadow-md' 
-                      : 'bg-background text-secondary border-border hover:border-primary hover:bg-primary-light'
+                    onClick={() => setFormData({...formData, category: cat.id})}
+                    className={`flex flex-col items-center justify-center p-4 rounded-2xl border-2 text-center transition-all ${
+                      formData.category === cat.id 
+                      ? 'bg-primary-light border-primary text-primary shadow-md transform scale-[1.02]' 
+                      : 'bg-surface border-border text-secondary hover:border-primary-light hover:bg-gray-50'
                     }`}
+                    style={{ minHeight: '100px' }}
                   >
-                    {cat}
+                    <Icon size={28} className={`mb-2 ${formData.category === cat.id ? 'text-primary' : 'text-muted'}`} strokeWidth={formData.category === cat.id ? 2.5 : 1.5} />
+                    <span className="text-xs font-bold leading-tight">{cat.id}</span>
                   </button>
-                ))}
+                )})}
               </div>
             </div>
 
