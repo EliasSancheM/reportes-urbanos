@@ -1,8 +1,8 @@
-import { useState, useContext } from 'react';
+import { useState, useContext, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { AuthContext } from '../context/AuthContext';
-import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, useMapEvents, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Camera, MapPin, CheckCircle, AlertCircle, UploadCloud, AlertTriangle, Lightbulb, Trash2, TreePine, Droplets, PawPrint, Home, AlertOctagon, ShieldAlert } from 'lucide-react';
@@ -20,6 +20,17 @@ const CATEGORIES = [
   { id: 'Señalética dañada', icon: AlertOctagon },
   { id: 'Seguridad y robos', icon: ShieldAlert }
 ];
+
+function MapFixer() {
+  const map = useMap();
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      map.invalidateSize();
+    }, 400);
+    return () => clearTimeout(timer);
+  }, [map]);
+  return null;
+}
 
 function LocationMarker({ position, setPosition }) {
   useMapEvents({
@@ -237,6 +248,7 @@ const NewReport = () => {
             
             <div className="w-full rounded-xl overflow-hidden shadow-inner border border-border relative h-[350px] md:h-[500px]">
               <MapContainer center={[-33.5289, -70.5983]} zoom={14} style={{ height: '100%', width: '100%' }}>
+                <MapFixer />
                 <TileLayer
                   attribution='&copy; OpenStreetMap'
                   url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
