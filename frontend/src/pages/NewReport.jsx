@@ -246,7 +246,7 @@ const NewReport = () => {
             
             <p className="text-sm text-muted mb-4">Navega por el mapa y haz clic en el punto exacto donde ocurre el problema.</p>
             
-            <div className="w-full rounded-xl overflow-hidden shadow-inner border border-border relative h-[350px] md:h-[500px]">
+            <div className="w-full rounded-xl overflow-hidden shadow-inner border border-border relative" style={{ height: '400px' }}>
               <MapContainer center={[-33.5289, -70.5983]} zoom={14} style={{ height: '100%', width: '100%' }}>
                 <MapFixer />
                 <TileLayer
